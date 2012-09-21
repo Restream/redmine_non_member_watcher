@@ -1,0 +1,4 @@
+ru:
+  label_issues_visibility_watch: "Задачи наблюдаемые пользователем"
+  label_role_non_member_watcher: "Не участник - наблюдатель"
+  permission_receive_email_notifications: "Получать уведомления по email"
