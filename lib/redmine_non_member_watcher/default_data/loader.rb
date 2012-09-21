@@ -9,10 +9,13 @@ module RedmineNonMemberWatcher
         end
 
         def load
-          Role.non_member_watcher.update_attribute :permissions, [
-              :view_issues,
-              :receive_email_notifications
-          ]
+          Role.non_member_watcher.update_attributes!(
+              :permissions => [
+                  :view_watched_issues,
+                  :receive_email_notifications
+              ],
+              :issues_visibility => 'watch'
+          )
         end
       end
     end

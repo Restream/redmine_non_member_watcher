@@ -27,7 +27,7 @@ class IssuePatchTest < ActiveSupport::TestCase
 
   def test_visible_for_non_member_watchers
     role = Role.non_member_watcher
-    role.permissions = [:view_issues]
+    role.permissions = [:view_watched_issues]
     role.save!
     assert @issue.visible?(@watcher)
   end

@@ -18,6 +18,7 @@ module RedmineNonMemberWatcher
           if context && context.is_a?(Project)
             roles = roles_for_project(context)
             roles.detect { |role|
+
               role == Role.non_member_watcher &&
                   role.allowed_to?(action) &&
                   (block_given? ? yield(role, self) : true)

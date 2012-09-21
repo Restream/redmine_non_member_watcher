@@ -8,7 +8,7 @@ module RedmineNonMemberWatcher
     module InstanceMethods
       def visible_with_watchers?(usr = nil)
         visible_without_watchers?(usr) ||
-          (usr || User.current).allowed_to?(:view_issues, self.project) do |role, user|
+          (usr || User.current).allowed_to?(:view_watched_issues, self.project) do |role, user|
             case role.issues_visibility
               when 'watch'
                 self.watchers.detect{ |w| w.user == user }.present?

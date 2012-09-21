@@ -22,6 +22,10 @@ class UserPatchTest < ActiveSupport::TestCase
     @watcher = User.find(4)
 
     @issue.add_watcher(@watcher)
+
+    @role = Role.non_member_watcher
+    @role.issues_visibility = 'watch'
+    @role.save!
   end
 
   def test_watcher_has_non_member_watcher_role
@@ -30,31 +34,27 @@ class UserPatchTest < ActiveSupport::TestCase
   end
 
   def test_watcher_has_permission_to_view_issues
-    role = Role.non_member_watcher
-    role.permissions = [:view_issues]
-    role.save!
-    assert @watcher.allowed_to?(:view_issues, @project)
+    @role.permissions = [:view_watched_issues]
+    @role.save!
+    assert @watcher.allowed_to?(:view_watched_issues, @project)
   end
 
   def test_watcher_has_no_permission_to_view_issues
-    role = Role.non_member_watcher
-    role.permissions = []
-    role.save!
-    assert_false !!@watcher.allowed_to?(:view_issues, @project)
+    @role.permissions = []
+    @role.save!
+    assert_false !!@watcher.allowed_to?(:view_watched_issues, @project)
   end
 
   def test_watcher_has_permission_to_receive_emails
-    role = Role.non_member_watcher
-    role.permissions = [:view_issues, :receive_email_notifications]
-    role.save!
+    @role.permissions = [:view_watched_issues, :receive_email_notifications]
+    @role.save!
     assert @watcher.allowed_to?(:receive_email_notifications, @project)
     assert_include @watcher.mail, @issue.watcher_recipients
   end
 
   def test_watcher_has_no_permission_to_receive_emails
-    role = Role.non_member_watcher
-    role.permissions = []
-    role.save!
+    @role.permissions = []
+    @role.save!
     assert_false !!@watcher.allowed_to?(:receive_email_notifications, @project)
     assert_not_include @watcher.mail, @issue.watcher_recipients
   end

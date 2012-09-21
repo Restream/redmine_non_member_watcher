@@ -7,13 +7,47 @@ module RedmineNonMemberWatcher
       base.const_set :BUILTIN_NON_MEMBER_WATCHER, 301
 
       base.extend ClassMethods
+      base.send :include, InstanceMethods
+      base.send :alias_method_chain, :setable_permissions, :non_member_watcher
+      base.send :alias_method_chain, :allowed_permissions, :non_member_watcher
     end
 
     module ClassMethods
       # Return the builtin 'non member watcher' role.  If the role doesn't exist,
       # it will be created on the fly.
       def non_member_watcher
-        find_or_create_system_role(Role::BUILTIN_NON_MEMBER_WATCHER, 'Non member watcher')
+        builtin = Role::BUILTIN_NON_MEMBER_WATCHER
+        name = 'Non member watcher'
+        role = first(:conditions => {:builtin => builtin})
+        if role.nil?
+          role = create(:name => name, :position => 0, :issues_visibility => 'watch') do |r|
+            r.builtin = builtin
+          end
+          raise "Unable to create the #{name} role." if role.new_record?
+        end
+        role
+      end
+    end
+
+    module InstanceMethods
+      def setable_permissions_with_non_member_watcher
+        if self.builtin == Role::BUILTIN_NON_MEMBER_WATCHER
+          Redmine::AccessControl.permissions.select do |perm|
+            [:view_watched_issues, :receive_email_notifications].include? perm.name
+          end
+        else
+          setable_permissions_without_non_member_watcher
+        end
+      end
+
+      private
+
+      def allowed_permissions_with_non_member_watcher
+        if self.builtin == Role::BUILTIN_NON_MEMBER_WATCHER
+          permissions
+        else
+          allowed_permissions_without_non_member_watcher
+        end
       end
     end
 
