@@ -12,7 +12,9 @@ module RedmineNonMemberWatcher
           Role.non_member_watcher.update_attributes!(
               :permissions => [
                   :view_watched_issues,
-                  :receive_email_notifications
+                  :receive_email_notifications,
+                  :edit_issues,
+                  :add_issue_notes
               ],
               :issues_visibility => 'watch'
           )
