@@ -31,12 +31,15 @@ module RedmineNonMemberWatcher
 
     module InstanceMethods
       def setable_permissions_with_non_member_watcher
+        perms = [:edit_issues, :add_issue_notes]
         if self.builtin == Role::BUILTIN_NON_MEMBER_WATCHER
           Redmine::AccessControl.permissions.select do |perm|
-            [:view_watched_issues, :receive_email_notifications].include? perm.name
+            perms.include?(perm.name) || perm.require_member_non_watcher?
           end
         else
-          setable_permissions_without_non_member_watcher
+          setable_permissions_without_non_member_watcher.select do |perm|
+            !perm.require_member_non_watcher?
+          end
         end
       end
 
