@@ -24,11 +24,15 @@ callbacks.to_prepare do
   unless Redmine::AccessControl.included_modules.include? RedmineNonMemberWatcher::AccessControlPatch
     Redmine::AccessControl.send :include, RedmineNonMemberWatcher::AccessControlPatch
   end
-  # if redmine default data loaded then load default data for this plugin
-  unless Redmine::DefaultData::Loader.no_data?
-    if RedmineNonMemberWatcher::DefaultData::Loader.no_data?
-      RedmineNonMemberWatcher::DefaultData::Loader.load
+  # if redmine default data loaded then try load default data for this plugin
+  begin
+    unless Redmine::DefaultData::Loader.no_data?
+      if RedmineNonMemberWatcher::DefaultData::Loader.no_data?
+        RedmineNonMemberWatcher::DefaultData::Loader.load
+      end
     end
+  rescue
+    # possible there is no tables yet
   end
 end
 
