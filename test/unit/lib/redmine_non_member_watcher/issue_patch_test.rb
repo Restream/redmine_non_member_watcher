@@ -23,12 +23,10 @@ class IssuePatchTest < ActiveSupport::TestCase
     @watcher = User.find(4)
 
     @issue.add_watcher(@watcher)
+    setup_non_member_watcher_role
   end
 
   def test_visible_for_non_member_watchers
-    role = Role.non_member_watcher
-    role.permissions = [:view_watched_issues]
-    role.save!
     assert @issue.visible?(@watcher)
   end
 end

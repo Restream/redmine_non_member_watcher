@@ -23,9 +23,7 @@ class UserPatchTest < ActiveSupport::TestCase
 
     @issue.add_watcher(@watcher)
 
-    @role = Role.non_member_watcher
-    @role.issues_visibility = 'watch'
-    @role.save!
+    @role = setup_non_member_watcher_role
   end
 
   def test_watcher_has_non_member_watcher_role

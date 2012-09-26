@@ -12,6 +12,7 @@ callbacks.to_prepare do
   require_dependency 'role'
   require_dependency 'issue'
   require_dependency 'attachment'
+  require_dependency 'watchers_controller'
   require_dependency 'redmine/access_control'
   unless User.included_modules.include? RedmineNonMemberWatcher::UserPatch
     User.send :include, RedmineNonMemberWatcher::UserPatch
@@ -24,6 +25,9 @@ callbacks.to_prepare do
   end
   unless Attachment.included_modules.include? RedmineNonMemberWatcher::AttachmentPatch
     Attachment.send :include, RedmineNonMemberWatcher::AttachmentPatch
+  end
+  unless WatchersController.included_modules.include? RedmineNonMemberWatcher::WatchersControllerPatch
+    WatchersController.send :include, RedmineNonMemberWatcher::WatchersControllerPatch
   end
   unless Redmine::AccessControl.included_modules.include? RedmineNonMemberWatcher::AccessControlPatch
     Redmine::AccessControl.send :include, RedmineNonMemberWatcher::AccessControlPatch
