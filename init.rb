@@ -11,6 +11,7 @@ callbacks.to_prepare do
   require_dependency 'user'
   require_dependency 'role'
   require_dependency 'issue'
+  require_dependency 'attachment'
   require_dependency 'redmine/access_control'
   unless User.included_modules.include? RedmineNonMemberWatcher::UserPatch
     User.send :include, RedmineNonMemberWatcher::UserPatch
@@ -20,6 +21,9 @@ callbacks.to_prepare do
   end
   unless Issue.included_modules.include? RedmineNonMemberWatcher::IssuePatch
     Issue.send :include, RedmineNonMemberWatcher::IssuePatch
+  end
+  unless Attachment.included_modules.include? RedmineNonMemberWatcher::AttachmentPatch
+    Attachment.send :include, RedmineNonMemberWatcher::AttachmentPatch
   end
   unless Redmine::AccessControl.included_modules.include? RedmineNonMemberWatcher::AccessControlPatch
     Redmine::AccessControl.send :include, RedmineNonMemberWatcher::AccessControlPatch
@@ -40,7 +44,7 @@ Redmine::Plugin.register :redmine_non_member_watcher do
   name 'Redmine Non Member Watcher plugin'
   author 'danil.tashkinov@gmail.com'
   description 'Redmine plugin that adds new system role "Non member watcher"'
-  version '0.0.4'
+  version '0.0.5'
   url 'https://github.com/Undev/redmine_non_member_watcher'
   author_url 'https://github.com/Undev'
   requires_redmine :version_or_higher => '1.4.0'
