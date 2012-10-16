@@ -29,5 +29,17 @@ class IssuePatchTest < ActiveSupport::TestCase
   def test_visible_for_non_member_watchers
     assert @issue.visible?(@watcher)
   end
+
+  def test_issue_included_in_visible_scope
+    issues = Issue.visible(@watcher)
+    assert_include @issue, issues
+  end
+
+  def test_no_non_visible_issues_in_list
+    issues = Issue.visible(@watcher)
+    issues.each do |issue|
+      assert issue.visible?(@watcher)
+    end
+  end
 end
 

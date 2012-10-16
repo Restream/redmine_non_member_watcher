@@ -2,3 +2,5 @@ en:
   label_issues_visibility_watch: "Issues watched by the user"
   label_role_non_member_watcher: Non member watcher
   permission_receive_email_notifications: "Receive email notifications"
+  permission_view_watched_issues: "View watched issues"
+  permission_view_watched_issues_list: "View watched issues list"

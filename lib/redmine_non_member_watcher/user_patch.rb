@@ -4,6 +4,9 @@ module RedmineNonMemberWatcher
       base.send :include, InstanceMethods
       base.send :alias_method_chain, :roles_for_project, :watcher
       base.send :alias_method_chain, :allowed_to?, :non_member_watcher
+      base.class_eval do
+        unloadable # Send unloadable so it will not be unloaded in development
+      end
     end
 
     module InstanceMethods
