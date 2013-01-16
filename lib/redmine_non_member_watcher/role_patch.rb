@@ -68,11 +68,12 @@ module RedmineNonMemberWatcher
       base.const_set :ISSUES_VISIBILITY_OPTIONS, new_issues_visibility_options
 
       # find validation callback with the old list and disable it
-      # todo: can't find the best way to redefine callback
-      Role.validate_callback_chain.each do |callback|
-        if callback.options[:in] == old_validation_opts
-          callback.instance_eval { @method = proc { |*args| true } }
-        end
+      filters = Role._validate_callbacks.select do |c|
+        c.options[:in] == old_validation_opts
+      end.map(&:filter)
+
+      filters.each do |filter|
+        Role.skip_callback(:validate, :before, filter)
       end
 
       # define callback with new list

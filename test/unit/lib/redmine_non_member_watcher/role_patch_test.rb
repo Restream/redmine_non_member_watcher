@@ -11,7 +11,7 @@ class RolePatchTest < ActiveSupport::TestCase
   def test_validate_new_visibility_option
     role = Role.non_member_watcher
     role.issues_visibility = 'watch'
-    assert_valid role
+    assert_true role.valid?
   end
 
   context "#non_member_watcher" do
