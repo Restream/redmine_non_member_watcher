@@ -16,8 +16,9 @@ module RedmineNonMemberWatcher
       def visible_condition_with_watchers(user, options={})
         issues = visible_condition_without_watchers(user, options)
 
-        if (watched_issues = watched_issues_condition(user, options))
-          "(#{issues}) OR (#{watched_issues})"
+        watched_issues_cond = watched_issues_condition(user, options)
+        if watched_issues_cond
+          "(#{issues}) OR (#{watched_issues_cond})"
         else
           issues
         end
@@ -27,7 +28,10 @@ module RedmineNonMemberWatcher
         Project.allowed_to_condition(user, :view_watched_issues_list, options) do |role, user|
           case role.issues_visibility
             when 'watch'
-              "#{Issue.table_name}.id in (select wrs.watchable_id from #{Watcher.table_name} wrs where wrs.watchable_type = 'Issue' and wrs.user_id = #{user.id})"
+              ["EXISTS (SELECT * FROM #{Watcher.table_name} as wts",
+                "WHERE wts.watchable_type = 'Issue'",
+                "AND wts.watchable_id = #{Issue.table_name}.id",
+                "AND wts.user_id = #{user.id})"].join(" ")
             else
               nil
           end

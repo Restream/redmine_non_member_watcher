@@ -12,8 +12,7 @@ module RedmineNonMemberWatcher
 
     module ClassMethods
       def allowed_to_condition_with_watchers(user, permission, options={}, &block)
-        watcher_permissions = [:view_watched_issues_list]
-        if !options[:member] && user.logged? && watcher_permissions.include?(permission)
+        if !options[:member] && user.logged? && permission == :view_watched_issues_list
 
           if Role.non_member_watcher.allowed_to?(permission)
             base_statement = "#{Project.table_name}.status=#{Project::STATUS_ACTIVE}"
@@ -23,30 +22,24 @@ module RedmineNonMemberWatcher
                 base_statement << " AND #{Project.table_name}.id IN (SELECT em.project_id FROM #{EnabledModule.table_name} em WHERE em.name='#{perm.project_module}')"
               end
             end
+
             if options[:project]
               project_statement = "#{Project.table_name}.id = #{options[:project].id}"
               project_statement << " OR (#{Project.table_name}.lft > #{options[:project].lft} AND #{Project.table_name}.rgt < #{options[:project].rgt})" if options[:with_subprojects]
               base_statement = "(#{project_statement}) AND (#{base_statement})"
-            end
-            statement_by_role = {
-                Role.non_member_watcher => <<-SQLEND
-                    #{Project.table_name}.id in (
-                        SELECT w_issues.project_id
-                        FROM #{Issue.table_name} w_issues
-                          INNER JOIN #{Watcher.table_name} w_watchers ON
-                            w_watchers.watchable_type = 'Issue' AND
-                            w_watchers.watchable_id = w_issues.id AND
-                            w_watchers.user_id = #{user.id} )
-                SQLEND
-            }
-            if block_given?
-              statement_by_role.each do |role, statement|
-                if (s = yield(role, user))
-                  statement_by_role[role] = "(#{statement} AND (#{s}))"
-                end
+            else
+              projects_statement = Issue.watched_by(user.id).map(&:project_id).uniq.join(",")
+              unless projects_statement.blank?
+                base_statement = "(#{Project.table_name}.id in (#{projects_statement})) AND (#{base_statement})"
               end
             end
-            "((#{base_statement}) AND (#{statement_by_role.values.join(' OR ')}))"
+
+            if block_given?
+              block_statement = yield(Role.non_member_watcher, user)
+              base_statement = "(#{base_statement}) AND (#{block_statement})" unless block_statement.blank?
+            end
+
+            base_statement
           else
             "1=0"
           end

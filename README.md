@@ -15,3 +15,7 @@ Follow the plugin installation procedure at http://www.redmine.org/wiki/redmine/
 ## Testing
 
 rake test:engines:all PLUGIN=redmine_non_member_watcher
+
+## Compatibility
+
+This version supports only redmine 1.4.x. See [redmine-2.x](https://github.com/Undev/redmine_non_member_watcher) branch for Redmine 2.x.
