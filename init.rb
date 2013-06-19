@@ -52,7 +52,7 @@ Redmine::Plugin.register :redmine_non_member_watcher do
   name 'Redmine Non Member Watcher plugin'
   author 'danil.tashkinov@gmail.com'
   description 'Redmine plugin that adds new system role "Non member watcher"'
-  version '0.1.0'
+  version '0.1.1'
   url 'https://github.com/Undev/redmine_non_member_watcher'
   author_url 'https://github.com/Undev'
   requires_redmine :version_or_higher => '2.0.0'

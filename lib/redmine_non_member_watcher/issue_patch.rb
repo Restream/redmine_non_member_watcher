@@ -18,7 +18,7 @@ module RedmineNonMemberWatcher
 
         watched_issues_cond = watched_issues_condition(user, options)
         if watched_issues_cond
-          "(#{issues}) OR (#{watched_issues_cond})"
+          "((#{issues}) OR (#{watched_issues_cond}))"
         else
           issues
         end
