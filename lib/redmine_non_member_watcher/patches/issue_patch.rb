@@ -1,15 +1,14 @@
-module RedmineNonMemberWatcher
-  module IssuePatch
-    def self.included(base)
-      base.extend ClassMethods
-      base.class_eval do
-        class << self
-          alias_method_chain :visible_condition, :watchers
-        end
-      end
+require 'issue'
 
-      base.send :include, InstanceMethods
-      base.send :alias_method_chain, :visible?, :watchers
+module RedmineNonMemberWatcher::Patches
+  module IssuePatch
+    extend ActiveSupport::Concern
+
+    included do
+      class << self
+        alias_method_chain :visible_condition, :watchers
+      end
+      alias_method_chain :visible?, :watchers
     end
 
     module ClassMethods
@@ -39,18 +38,20 @@ module RedmineNonMemberWatcher
       end
     end
 
-    module InstanceMethods
-      def visible_with_watchers?(usr = nil)
-        visible_without_watchers?(usr) ||
-          (usr || User.current).allowed_to?(:view_watched_issues, self.project) do |role, user|
-            case role.issues_visibility
-              when 'watch'
-                self.watchers.detect{ |w| w.user == user }.present?
-              else
-                false
-            end
+    def visible_with_watchers?(usr = nil)
+      visible_without_watchers?(usr) ||
+        (usr || User.current).allowed_to?(:view_watched_issues, self.project) do |role, user|
+          case role.issues_visibility
+            when 'watch'
+              self.watchers.detect{ |w| w.user == user }.present?
+            else
+              false
           end
-      end
+        end
     end
   end
+end
+
+unless Issue.included_modules.include? RedmineNonMemberWatcher::Patches::IssuePatch
+  Issue.send :include, RedmineNonMemberWatcher::Patches::IssuePatch
 end

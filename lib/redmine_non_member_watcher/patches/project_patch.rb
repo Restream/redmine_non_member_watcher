@@ -1,12 +1,12 @@
-module RedmineNonMemberWatcher
+require 'project'
+
+module RedmineNonMemberWatcher::Patches
   module ProjectPatch
-    def self.included(base)
-      base.extend ClassMethods
-      base.class_eval do
-        unloadable # Send unloadable so it will not be unloaded in development
-        class << self
-          alias_method_chain :allowed_to_condition, :watchers
-        end
+    extend ActiveSupport::Concern
+
+    included do
+      class << self
+        alias_method_chain :allowed_to_condition, :watchers
       end
     end
 
@@ -48,6 +48,11 @@ module RedmineNonMemberWatcher
           allowed_to_condition_without_watchers(user, permission, options, &block)
         end
       end
+
     end
   end
+end
+
+unless Project.included_modules.include? RedmineNonMemberWatcher::Patches::ProjectPatch
+  Project.send :include, RedmineNonMemberWatcher::Patches::ProjectPatch
 end
