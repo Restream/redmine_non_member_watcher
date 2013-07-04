@@ -6,7 +6,17 @@ module RedmineNonMemberWatcher::Patches
 
     module ClassMethods
       def non_member_watcher_permissions
-        @permissions ||= @permissions.select {|p| p.require_member_non_watcher?}
+        permissions.select do |p|
+          [:edit_issues, :add_issue_notes].include?(p) ||
+              p.require_non_member_watcher?
+        end
+      end
+
+      def non_member_author_permissions
+        permissions.select do |p|
+          [:edit_issues, :add_issue_notes].include?(p) ||
+              p.require_non_member_author?
+        end
       end
     end
   end
@@ -16,8 +26,12 @@ module RedmineNonMemberWatcher::Patches
   module AccessControlPermissionPatch
     extend ActiveSupport::Concern
 
-    def require_member_non_watcher?
-      @require && @require == :member_non_watcher
+    def require_non_member_watcher?
+      @require && @require == :non_member_watcher
+    end
+
+    def require_non_member_author?
+      @require && @require == :non_member_author
     end
   end
 end

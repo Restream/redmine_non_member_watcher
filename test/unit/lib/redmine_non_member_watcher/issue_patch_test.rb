@@ -28,7 +28,7 @@ class IssuePatchTest < ActiveSupport::TestCase
     assert_false @issue.visible?(@watcher)
   end
 
-  def test_issue_included_in_visible_scope
+  def test_issue_included_in_visible_watcher_scope
     Role.non_member_watcher.update_attributes({
         :permissions => [:view_watched_issues, :view_watched_issues_list]
     })
@@ -36,7 +36,7 @@ class IssuePatchTest < ActiveSupport::TestCase
     assert_include @issue, issues
   end
 
-  def test_issue_not_included_in_visible_scope
+  def test_issue_not_included_in_visible_watcher_scope
     Role.non_member_watcher.update_attributes({
         :permissions => []
     })
@@ -44,7 +44,7 @@ class IssuePatchTest < ActiveSupport::TestCase
     assert_not_include @issue, issues
   end
 
-  def test_no_non_visible_issues_in_list
+  def test_no_non_visible_issues_in_watcher_list
     Role.non_member_watcher.update_attributes({
         :permissions => [:view_watched_issues, :view_watched_issues_list]
     })
@@ -56,7 +56,7 @@ class IssuePatchTest < ActiveSupport::TestCase
 
   def test_visible_for_non_member_authors
     Role.non_member_author.update_attributes({
-        :permissions => [:view_created_issues]
+        :permissions => [:view_own_issues]
     })
     assert @issue.visible?(@author)
   end
@@ -70,7 +70,7 @@ class IssuePatchTest < ActiveSupport::TestCase
 
   def test_issue_included_in_visible_scope
     Role.non_member_author.update_attributes({
-        :permissions => [:view_created_issues, :view_created_issues_list]
+        :permissions => [:view_own_issues, :view_own_issues_list]
     })
     issues = Issue.visible(@author)
     assert_include @issue, issues
@@ -86,7 +86,7 @@ class IssuePatchTest < ActiveSupport::TestCase
 
   def test_no_non_visible_issues_in_list
     Role.non_member_author.update_attributes({
-        :permissions => [:view_created_issues, :view_created_issues_list]
+        :permissions => [:view_own_issues, :view_own_issues_list]
     })
     issues = Issue.visible(@author)
     issues.each do |issue|

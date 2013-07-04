@@ -15,22 +15,10 @@ class RedmineNonMemberWatcher::WatchersControllerTest < ActionController::TestCa
            :issues
 
   def setup
-    @issue = Issue.find(1)
-
-    @project = @issue.project
-
-    # make project private
-    @project.is_public = false
-    @project.save!
-
-    # non_member watcher for issue project
-    @watcher = User.find(4)
-    @issue.add_watcher(@watcher)
-
+    prepare_for_testing_non_meber_roles
     @controller = WatchersController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-    create_non_member_roles
   end
 
   def test_unwatch_for_non_member_watcher

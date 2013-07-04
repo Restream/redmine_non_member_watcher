@@ -4,7 +4,7 @@ class ActiveSupport::TestCase
 
   # @project -> { id: 1, public: false }
   # @issue -> { id: 1, attachments => [@attachment], watchers: [@watcher]
-  # @author { id: 2, login: 'jsmith', authored_issues_in_project: [1, 2, 3, 7, 8, 11] }
+  # @author { id: 2, login: 'jsmith', authored_issues_in_project: [1, 2, 3, 5, 6, 7, 9, 10, 13, 14] }
   # @watcher { id: 4, login: 'rhill', watched_issues_in_project: [13, 5, 1] }
   def prepare_for_testing_non_meber_roles
     @issue = Issue.find(1)

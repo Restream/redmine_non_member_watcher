@@ -11,8 +11,14 @@ Redmine::Plugin.register :redmine_non_member_watcher do
   requires_redmine :version_or_higher => '2.1.0'
 
   project_module :issue_tracking do |map|
-    map.permission :receive_email_notifications, {}, :require => :member_non_watcher
-    map.permission :view_watched_issues, { :issues => [:show] }, :require => :member_non_watcher
-    map.permission :view_watched_issues_list, { :issues => [:index] }, :require => :member_non_watcher
+    # non_member_watcher
+    map.permission :view_watched_issues, { :issues => [:show] }, :require => :non_member_watcher
+    map.permission :view_watched_issues_list, { :issues => [:index] }, :require => :non_member_watcher
+    map.permission :receive_watched_issues_notifications, {}, :require => :non_member_watcher
+
+    # non_member_author
+    map.permission :view_own_issues, { :issues => [:show] }, :require => :non_member_author
+    map.permission :view_own_issues_list, { :issues => [:index] }, :require => :non_member_author
+    map.permission :receive_own_issues_notifications, {}, :require => :non_member_author
   end
 end

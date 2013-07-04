@@ -20,28 +20,32 @@ class UserPatchTest < ActiveSupport::TestCase
   end
 
   def test_watcher_has_permission_to_view_issues
-    @role.permissions = [:view_watched_issues]
-    @role.save!
+    role = Role.non_member_watcher
+    role.permissions = [:view_watched_issues]
+    role.save!
     assert @watcher.allowed_to?(:view_watched_issues, @project)
   end
 
   def test_watcher_has_no_permission_to_view_issues
-    @role.permissions = []
-    @role.save!
+    role = Role.non_member_watcher
+    role.permissions = []
+    role.save!
     assert_false !!@watcher.allowed_to?(:view_watched_issues, @project)
   end
 
   def test_watcher_has_permission_to_receive_emails
-    @role.permissions = [:view_watched_issues, :receive_email_notifications]
-    @role.save!
-    assert @watcher.allowed_to?(:receive_email_notifications, @project)
+    role = Role.non_member_watcher
+    role.permissions = [:view_watched_issues, :receive_watched_issues_notifications]
+    role.save!
+    assert @watcher.allowed_to?(:receive_watched_issues_notifications, @project)
     assert_include @watcher.mail, @issue.watcher_recipients
   end
 
   def test_watcher_has_no_permission_to_receive_emails
-    @role.permissions = []
-    @role.save!
-    assert_false !!@watcher.allowed_to?(:receive_email_notifications, @project)
+    role = Role.non_member_watcher
+    role.permissions = []
+    role.save!
+    assert_false !!@watcher.allowed_to?(:receive_watched_issues_notifications, @project)
     assert_not_include @watcher.mail, @issue.watcher_recipients
   end
 
@@ -51,28 +55,32 @@ class UserPatchTest < ActiveSupport::TestCase
   end
 
   def test_author_has_permission_to_view_issues
-    @role.permissions = [:view_created_issues]
-    @role.save!
-    assert @author.allowed_to?(:view_created_issues, @project)
+    role = Role.non_member_author
+    role.permissions = [:view_own_issues]
+    role.save!
+    assert @author.allowed_to?(:view_own_issues, @project)
   end
 
   def test_author_has_no_permission_to_view_issues
-    @role.permissions = []
-    @role.save!
-    assert_false !!@author.allowed_to?(:view_created_issues, @project)
+    role = Role.non_member_author
+    role.permissions = []
+    role.save!
+    assert_false !!@author.allowed_to?(:view_own_issues, @project)
   end
 
   def test_author_has_permission_to_receive_emails
-    @role.permissions = [:view_created_issues, :receive_email_notifications]
-    @role.save!
-    assert @author.allowed_to?(:receive_email_notifications, @project)
+    role = Role.non_member_author
+    role.permissions = [:view_own_issues, :receive_own_issues_notifications]
+    role.save!
+    assert @author.allowed_to?(:receive_own_issues_notifications, @project)
     assert_include @author.mail, @issue.recipients
   end
 
   def test_author_has_no_permission_to_receive_emails
-    @role.permissions = []
-    @role.save!
-    assert_false !!@author.allowed_to?(:receive_email_notifications, @project)
+    role = Role.non_member_author
+    role.permissions = []
+    role.save!
+    assert_false !!@author.allowed_to?(:receive_own_issues_notifications, @project)
     assert_not_include @author.mail, @issue.recipients
   end
 end

@@ -7,40 +7,47 @@ module RedmineNonMemberWatcher::Patches
     included do |base|
       self.send :redefine_issues_visibility, base
 
-      # define new builtin constant
+      # define new builtin constants
       BUILTIN_NON_MEMBER_WATCHER = 301
+      BUILTIN_NON_MEMBER_AUTHOR  = 302
 
-      alias_method_chain :setable_permissions, :non_member_watcher
-      alias_method_chain :allowed_permissions, :non_member_watcher
+      alias_method_chain :setable_permissions, :non_member_roles
+      #alias_method_chain :allowed_permissions, :non_member_watcher
     end
 
     module ClassMethods
-      # Return the builtin 'non member watcher' role.  If the role doesn't exist,
-      # it will be created on the fly.
+      # Return the builtin 'non member watcher' role.
+      # If the role doesn't exist,
+      # it will be created on the fly with default options.
       def non_member_watcher
-        builtin = Role::BUILTIN_NON_MEMBER_WATCHER
-        role = self.find_by_builtin(builtin)
-        if role.nil?
-          name = 'Non member watcher'
-          role = self.new(
-              :name => name,
-              :position => 0,
-              :issues_visibility => 'watch',
-              :permissions => [
-                  :view_watched_issues,
-                  :view_watched_issues_list,
-                  :receive_email_notifications,
-                  :edit_issues,
-                  :add_issue_notes]
-          )
-          role.builtin = builtin
-          unless role.save
-            logger.error "Unable to create the #{name} role.\n" +
-                             role.errors.full_messages.join("\n")
-            raise "Unable to create the #{name} role."
-          end
-        end
-        role
+        find_or_create_system_role_with_options(
+            Role::BUILTIN_NON_MEMBER_WATCHER,
+            'Non member watcher',
+            :issues_visibility => 'watch',
+            :permissions => [
+                :view_watched_issues,
+                :view_watched_issues_list,
+                :receive_watched_issues_notifications,
+                :edit_issues,
+                :add_issue_notes]
+        )
+      end
+
+      # Return the builtin 'non member author' role.
+      # If the role doesn't exist,
+      # it will be created on the fly with default options.
+      def non_member_author
+        find_or_create_system_role_with_options(
+            Role::BUILTIN_NON_MEMBER_AUTHOR,
+            'Non member author',
+            :issues_visibility => 'own',
+            :permissions => [
+                :view_own_issues,
+                :view_own_issues_list,
+                :receive_own_issues_notifications,
+                :edit_issues,
+                :add_issue_notes]
+        )
       end
 
       private
@@ -70,28 +77,45 @@ module RedmineNonMemberWatcher::Patches
                   :in => base::ISSUES_VISIBILITY_OPTIONS.collect(&:first),
                   :if => lambda {|role| role.respond_to?(:issues_visibility)}
       end
+
+      def find_or_create_system_role_with_options(*args)
+        options = args.extract_options!
+        builtin, name = args[0], args[1]
+        role = where(:builtin => builtin).first
+        if role.nil?
+          options.merge!(:name => name, :position => 0)
+          role = create(options) do |r|
+            r.builtin = builtin
+          end
+          raise "Unable to create the #{name} role." if role.new_record?
+        end
+        role
+      end
     end
 
-    def setable_permissions_with_non_member_watcher
-      perms = [:edit_issues, :add_issue_notes]
-      if self.builtin == Role::BUILTIN_NON_MEMBER_WATCHER
-        Redmine::AccessControl.permissions.select do |perm|
-          perms.include?(perm.name) || perm.require_member_non_watcher?
-        end
-      else
-        setable_permissions_without_non_member_watcher.select do |perm|
-          !perm.require_member_non_watcher?
-        end
+    def setable_permissions_with_non_member_roles
+      case self.builtin
+        when Role::BUILTIN_NON_MEMBER_WATCHER
+          Redmine::AccessControl.non_member_watcher_permissions
+
+        when Role::BUILTIN_NON_MEMBER_AUTHOR
+          Redmine::AccessControl.non_member_author_permissions
+
+        else
+          setable_permissions_without_non_member_roles.reject do |perm|
+            perm.require_non_member_watcher? || perm.require_non_member_author?
+          end
       end
     end
 
     private
 
     def allowed_permissions_with_non_member_watcher
-      if self.builtin == Role::BUILTIN_NON_MEMBER_WATCHER
-        permissions
-      else
-        allowed_permissions_without_non_member_watcher
+      case self.builtin
+        when Role::BUILTIN_NON_MEMBER_WATCHER, Role::BUILTIN_NON_MEMBER_AUTHOR
+          permissions
+        else
+          allowed_permissions_without_non_member_watcher
       end
     end
   end

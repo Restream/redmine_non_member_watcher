@@ -6,21 +6,22 @@ module RedmineNonMemberWatcher::Patches
 
     included do
       class << self
-        alias_method_chain :visible_condition, :watchers
+        alias_method_chain :visible_condition, :non_member_roles
       end
       alias_method_chain :visible?, :watchers
+      alias_method_chain :visible?, :authors
     end
 
     module ClassMethods
-      def visible_condition_with_watchers(user, options={})
-        issues = visible_condition_without_watchers(user, options)
-
+      def visible_condition_with_non_member_roles(user, options={})
+        issues_cond = visible_condition_without_non_member_roles(user, options)
         watched_issues_cond = watched_issues_condition(user, options)
-        if watched_issues_cond
-          "((#{issues}) OR (#{watched_issues_cond}))"
-        else
-          issues
-        end
+        own_issues_cond = own_issues_condition(user, options)
+        [
+            issues_cond,
+            watched_issues_cond,
+            own_issues_cond
+        ].map { |c| "(#{c})" }.join(' OR ')
       end
 
       def watched_issues_condition(user, options={})
@@ -36,6 +37,17 @@ module RedmineNonMemberWatcher::Patches
           end
         end
       end
+
+      def own_issues_condition(user, options={})
+        Project.allowed_to_condition(user, :view_own_issues_list, options) do |role, user|
+          case role.issues_visibility
+            when 'own'
+              "#{Issue.table_name}.author_id = #{user.id}"
+            else
+              nil
+          end
+        end
+      end
     end
 
     def visible_with_watchers?(usr = nil)
@@ -44,6 +56,18 @@ module RedmineNonMemberWatcher::Patches
           case role.issues_visibility
             when 'watch'
               self.watchers.detect{ |w| w.user == user }.present?
+            else
+              false
+          end
+        end
+    end
+
+    def visible_with_authors?(usr = nil)
+      visible_without_authors?(usr) ||
+        (usr || User.current).allowed_to?(:view_own_issues, self.project) do |role, user|
+          case role.issues_visibility
+            when 'own'
+              self.author_id == user.id
             else
               false
           end

@@ -3,16 +3,17 @@ require 'issues_controller'
 
 class NonMemberRolesTest < ActionController::IntegrationTest
   fixtures :projects, :users, :members, :member_roles, :roles,
-           :groups_users,
-           :trackers, :projects_trackers,
+           :trackers,
            :enabled_modules,
            :versions,
-           :issue_statuses, :issue_categories, :issue_relations, :workflows,
+           :issue_statuses, :issue_categories, :issue_relations,
            :enumerations,
            :issues, :attachments
 
   def setup
     prepare_for_testing_non_meber_roles
+    Role.non_member_watcher.update_attributes :permissions => []
+    Role.non_member_author.update_attributes :permissions => []
   end
 
   def test_view_watched_issues_list
@@ -87,9 +88,9 @@ class NonMemberRolesTest < ActionController::IntegrationTest
     assert_response 403
   end
 
-  def test_view_created_issues_list
+  def test_view_own_issues_list
     Role.non_member_author.update_attributes({
-        :permissions => [:view_created_issues_list]
+        :permissions => [:view_own_issues_list]
     })
 
     login_author
@@ -97,10 +98,10 @@ class NonMemberRolesTest < ActionController::IntegrationTest
 
     assert_response :success
     assert_select 'table.issues' do
-      assert_select 'tr.issue', 3
-      assert_select "tr#issue-13", 1
-      assert_select "tr#issue-5", 1
-      assert_select "tr#issue-1", 1
+      assert_select 'tr.issue', 10
+      [1, 2, 3, 5, 6, 7, 9, 10, 13, 14].each do |id|
+        assert_select "tr#issue-#{id}", 1
+      end
     end
   end
 
@@ -115,9 +116,9 @@ class NonMemberRolesTest < ActionController::IntegrationTest
     assert_response 403
   end
 
-  def test_view_created_issues
+  def test_view_own_issues
     Role.non_member_author.update_attributes({
-        :permissions => [:view_created_issues]
+        :permissions => [:view_own_issues]
     })
 
     login_author
@@ -139,7 +140,7 @@ class NonMemberRolesTest < ActionController::IntegrationTest
 
   def test_view_created_issue_attachments
     Role.non_member_author.update_attributes({
-        :permissions => [:view_created_issues]
+        :permissions => [:view_own_issues]
     })
 
     login_author
