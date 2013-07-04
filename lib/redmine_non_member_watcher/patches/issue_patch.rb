@@ -17,11 +17,10 @@ module RedmineNonMemberWatcher::Patches
         issues_cond = visible_condition_without_non_member_roles(user, options)
         watched_issues_cond = watched_issues_condition(user, options)
         own_issues_cond = own_issues_condition(user, options)
-        [
-            issues_cond,
-            watched_issues_cond,
-            own_issues_cond
-        ].map { |c| "(#{c})" }.join(' OR ')
+        conditions = [issues_cond, watched_issues_cond, own_issues_cond]
+        conditions.delete_if { |c| c == '1=0' }
+        conditions.compact!
+        conditions.map { |c| "(#{c})" }.join(' OR ')
       end
 
       def watched_issues_condition(user, options={})
