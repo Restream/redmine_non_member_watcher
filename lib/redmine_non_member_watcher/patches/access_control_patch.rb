@@ -7,14 +7,14 @@ module RedmineNonMemberWatcher::Patches
     module ClassMethods
       def non_member_watcher_permissions
         permissions.select do |p|
-          [:edit_issues, :add_issue_notes].include?(p) ||
+          [:edit_issues, :add_issue_notes].include?(p.name) ||
               p.require_non_member_watcher?
         end
       end
 
       def non_member_author_permissions
         permissions.select do |p|
-          [:edit_issues, :add_issue_notes].include?(p) ||
+          [:edit_issues, :add_issue_notes].include?(p.name) ||
               p.require_non_member_author?
         end
       end
