@@ -1,10 +1,10 @@
-require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path('../../../test_helper', __FILE__)
 require 'watchers_controller'
 
 # Re-raise errors caught by the controller.
 class WatchersController; def rescue_action(e) raise e end; end
 
-class WatchersControllerTest < ActionController::TestCase
+class RedmineNonMemberWatcher::WatchersControllerTest < ActionController::TestCase
   fixtures :projects, :users, :members, :member_roles, :roles,
            :groups_users,
            :trackers, :projects_trackers,
@@ -23,19 +23,18 @@ class WatchersControllerTest < ActionController::TestCase
     @project.is_public = false
     @project.save!
 
-    # non_member for issue project
+    # non_member watcher for issue project
     @watcher = User.find(4)
-
     @issue.add_watcher(@watcher)
 
     @controller = WatchersController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-    User.current = @watcher
-    setup_non_member_watcher_role
+    create_non_member_roles
   end
 
   def test_unwatch_for_non_member_watcher
+    User.current = @watcher
     @request.session[:user_id] = @watcher.id
     xhr :post, :unwatch, :object_type => 'issue', :object_id => @issue.id
     assert_response :success

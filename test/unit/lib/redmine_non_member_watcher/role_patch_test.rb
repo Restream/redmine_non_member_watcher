@@ -40,5 +40,31 @@ class RolePatchTest < ActiveSupport::TestCase
     end
   end
 
+  context "#non_member_author" do
+    should "return the non-member-author role" do
+      role = Role.non_member_author
+      assert role.builtin?
+      assert_equal Role::BUILTIN_NON_MEMBER_AUTHOR, role.builtin
+    end
+
+    context "with a missing non-member-author role" do
+      setup do
+        Role.delete_all("builtin = #{Role::BUILTIN_NON_MEMBER_AUTHOR}")
+      end
+
+      should "create a new non-member-author role" do
+        assert_difference('Role.count') do
+          Role.non_member_author
+        end
+      end
+
+      should "return the non-member-author role" do
+        role = Role.non_member_author
+        assert role.builtin?
+        assert_equal Role::BUILTIN_NON_MEMBER_AUTHOR, role.builtin
+      end
+    end
+  end
+
 end
 

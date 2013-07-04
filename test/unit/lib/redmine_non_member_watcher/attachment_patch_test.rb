@@ -11,26 +11,35 @@ class AttachmentPatchTest < ActiveSupport::TestCase
            :issues, :attachments
 
   def setup
-    @issue = Issue.find(1)
-    @attachment = Attachment.find(1)
-    @attachment.container = @issue
-    @attachment.save!
-
-    @project = @issue.project
-
-    # make project private
-    @project.is_public = false
-    @project.save!
-
-    # non_member for issue project
-    @watcher = User.find(4)
-
-    @issue.add_watcher(@watcher)
-    setup_non_member_watcher_role
+    prepare_for_testing_non_meber_roles
   end
 
   def test_visible_for_non_member_watchers
-    assert @attachment.visible?(@watcher)
+    Role.non_member_watcher.update_attributes({
+        :permissions => [:view_watched_issues]
+    })
+    assert_true @attachment.visible?(@watcher)
+  end
+
+  def test_not_visible_for_non_member_watchers
+    Role.non_member_watcher.update_attributes({
+        :permissions => []
+    })
+    assert_false @attachment.visible?(@watcher)
+  end
+
+  def test_visible_for_non_member_authors
+    Role.non_member_author.update_attributes({
+        :permissions => [:view_created_issues]
+    })
+    assert_true @attachment.visible?(@author)
+  end
+
+  def test_not_visible_for_non_member_authors
+    Role.non_member_author.update_attributes({
+        :permissions => []
+    })
+    assert_false @attachment.visible?(@author)
   end
 end
 

@@ -19,13 +19,12 @@ module RedmineNonMemberWatcher::Patches
       # it will be created on the fly.
       def non_member_watcher
         builtin = Role::BUILTIN_NON_MEMBER_WATCHER
-        role = where(:builtin => builtin)
+        role = self.find_by_builtin(builtin)
         if role.nil?
           name = 'Non member watcher'
-          role = create(
-              :names => name,
+          role = self.new(
+              :name => name,
               :position => 0,
-              :builtin => builtin,
               :issues_visibility => 'watch',
               :permissions => [
                   :view_watched_issues,
@@ -34,7 +33,8 @@ module RedmineNonMemberWatcher::Patches
                   :edit_issues,
                   :add_issue_notes]
           )
-          if role.new_record?
+          role.builtin = builtin
+          unless role.save
             logger.error "Unable to create the #{name} role.\n" +
                              role.errors.full_messages.join("\n")
             raise "Unable to create the #{name} role."

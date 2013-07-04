@@ -11,34 +11,86 @@ class IssuePatchTest < ActiveSupport::TestCase
            :issues
 
   def setup
-    @issue = Issue.find(1)
-
-    @project = @issue.project
-
-    # make project private
-    @project.is_public = false
-    @project.save!
-
-    # non_member for issue project
-    @watcher = User.find(4)
-
-    @issue.add_watcher(@watcher)
-    setup_non_member_watcher_role
+    prepare_for_testing_non_meber_roles
   end
 
   def test_visible_for_non_member_watchers
+    Role.non_member_watcher.update_attributes({
+        :permissions => [:view_watched_issues]
+    })
     assert @issue.visible?(@watcher)
   end
 
+  def test_not_visible_for_non_member_watchers
+    Role.non_member_watcher.update_attributes({
+        :permissions => []
+    })
+    assert_false @issue.visible?(@watcher)
+  end
+
   def test_issue_included_in_visible_scope
+    Role.non_member_watcher.update_attributes({
+        :permissions => [:view_watched_issues, :view_watched_issues_list]
+    })
     issues = Issue.visible(@watcher)
     assert_include @issue, issues
   end
 
+  def test_issue_not_included_in_visible_scope
+    Role.non_member_watcher.update_attributes({
+        :permissions => []
+    })
+    issues = Issue.visible(@watcher)
+    assert_not_include @issue, issues
+  end
+
   def test_no_non_visible_issues_in_list
+    Role.non_member_watcher.update_attributes({
+        :permissions => [:view_watched_issues, :view_watched_issues_list]
+    })
     issues = Issue.visible(@watcher)
     issues.each do |issue|
       assert issue.visible?(@watcher)
+    end
+  end
+
+  def test_visible_for_non_member_authors
+    Role.non_member_author.update_attributes({
+        :permissions => [:view_created_issues]
+    })
+    assert @issue.visible?(@author)
+  end
+
+  def test_not_visible_for_non_member_authors
+    Role.non_member_author.update_attributes({
+        :permissions => []
+    })
+    assert_false @issue.visible?(@author)
+  end
+
+  def test_issue_included_in_visible_scope
+    Role.non_member_author.update_attributes({
+        :permissions => [:view_created_issues, :view_created_issues_list]
+    })
+    issues = Issue.visible(@author)
+    assert_include @issue, issues
+  end
+
+  def test_issue_not_included_in_visible_scope
+    Role.non_member_author.update_attributes({
+        :permissions => []
+    })
+    issues = Issue.visible(@author)
+    assert_not_include @issue, issues
+  end
+
+  def test_no_non_visible_issues_in_list
+    Role.non_member_author.update_attributes({
+        :permissions => [:view_created_issues, :view_created_issues_list]
+    })
+    issues = Issue.visible(@author)
+    issues.each do |issue|
+      assert issue.visible?(@author)
     end
   end
 end

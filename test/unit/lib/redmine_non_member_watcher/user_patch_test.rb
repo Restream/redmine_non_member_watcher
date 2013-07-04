@@ -11,19 +11,7 @@ class UserPatchTest < ActiveSupport::TestCase
            :issues
 
   def setup
-    @issue = Issue.find(1)
-    @project = @issue.project
-
-    # make project private
-    @project.is_public = false
-    @project.save!
-
-    # non_member for issue project
-    @watcher = User.find(4)
-
-    @issue.add_watcher(@watcher)
-
-    @role = setup_non_member_watcher_role
+    prepare_for_testing_non_meber_roles
   end
 
   def test_watcher_has_non_member_watcher_role
@@ -55,6 +43,37 @@ class UserPatchTest < ActiveSupport::TestCase
     @role.save!
     assert_false !!@watcher.allowed_to?(:receive_email_notifications, @project)
     assert_not_include @watcher.mail, @issue.watcher_recipients
+  end
+
+  def test_author_has_non_member_author_role
+    roles = @author.roles_for_project(@project)
+    assert_include Role.non_member_author, roles
+  end
+
+  def test_author_has_permission_to_view_issues
+    @role.permissions = [:view_created_issues]
+    @role.save!
+    assert @author.allowed_to?(:view_created_issues, @project)
+  end
+
+  def test_author_has_no_permission_to_view_issues
+    @role.permissions = []
+    @role.save!
+    assert_false !!@author.allowed_to?(:view_created_issues, @project)
+  end
+
+  def test_author_has_permission_to_receive_emails
+    @role.permissions = [:view_created_issues, :receive_email_notifications]
+    @role.save!
+    assert @author.allowed_to?(:receive_email_notifications, @project)
+    assert_include @author.mail, @issue.recipients
+  end
+
+  def test_author_has_no_permission_to_receive_emails
+    @role.permissions = []
+    @role.save!
+    assert_false !!@author.allowed_to?(:receive_email_notifications, @project)
+    assert_not_include @author.mail, @issue.recipients
   end
 end
 
