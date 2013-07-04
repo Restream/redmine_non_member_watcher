@@ -12,7 +12,6 @@ module RedmineNonMemberWatcher::Patches
       BUILTIN_NON_MEMBER_AUTHOR  = 302
 
       alias_method_chain :setable_permissions, :non_member_roles
-      #alias_method_chain :allowed_permissions, :non_member_watcher
     end
 
     module ClassMethods
@@ -93,29 +92,26 @@ module RedmineNonMemberWatcher::Patches
       end
     end
 
+    def non_member_watcher?
+      self.builtin == Role::BUILTIN_NON_MEMBER_WATCHER
+    end
+
+    def non_member_author?
+      self.builtin == Role::BUILTIN_NON_MEMBER_AUTHOR
+    end
+
     def setable_permissions_with_non_member_roles
-      case self.builtin
-        when Role::BUILTIN_NON_MEMBER_WATCHER
+      case
+        when non_member_watcher?
           Redmine::AccessControl.non_member_watcher_permissions
 
-        when Role::BUILTIN_NON_MEMBER_AUTHOR
+        when non_member_author?
           Redmine::AccessControl.non_member_author_permissions
 
         else
           setable_permissions_without_non_member_roles.reject do |perm|
             perm.require_non_member_watcher? || perm.require_non_member_author?
           end
-      end
-    end
-
-    private
-
-    def allowed_permissions_with_non_member_watcher
-      case self.builtin
-        when Role::BUILTIN_NON_MEMBER_WATCHER, Role::BUILTIN_NON_MEMBER_AUTHOR
-          permissions
-        else
-          allowed_permissions_without_non_member_watcher
       end
     end
   end

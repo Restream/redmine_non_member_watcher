@@ -1,6 +1,9 @@
 require 'redmine'
 require 'redmine_non_member_watcher'
 
+Rails.application.paths["app/overrides"] ||= []
+Rails.application.paths["app/overrides"] << File.expand_path("../app/overrides", __FILE__)
+
 Redmine::Plugin.register :redmine_non_member_watcher do
   name 'Redmine Non Member Watcher plugin'
   author 'Danil Tashkinov'
