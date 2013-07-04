@@ -26,26 +26,16 @@ module RedmineNonMemberWatcher::Patches
 
       def watched_issues_condition(user, options={})
         Project.allowed_to_condition(user, :view_watched_issues_list, options) do |role, user|
-          case role.issues_visibility
-            when 'watch'
-              ["EXISTS (SELECT * FROM #{Watcher.table_name} as wts",
-                "WHERE wts.watchable_type = 'Issue'",
-                "AND wts.watchable_id = #{Issue.table_name}.id",
-                "AND wts.user_id = #{user.id})"].join(" ")
-            else
-              nil
-          end
+          ["EXISTS (SELECT * FROM #{Watcher.table_name} as wts",
+            "WHERE wts.watchable_type = 'Issue'",
+            "AND wts.watchable_id = #{Issue.table_name}.id",
+            "AND wts.user_id = #{user.id})"].join(" ")
         end
       end
 
       def own_issues_condition(user, options={})
         Project.allowed_to_condition(user, :view_own_issues_list, options) do |role, user|
-          case role.issues_visibility
-            when 'own'
-              "#{Issue.table_name}.author_id = #{user.id}"
-            else
-              nil
-          end
+          "#{Issue.table_name}.author_id = #{user.id}"
         end
       end
     end
@@ -53,24 +43,14 @@ module RedmineNonMemberWatcher::Patches
     def visible_with_watchers?(usr = nil)
       visible_without_watchers?(usr) ||
         (usr || User.current).allowed_to?(:view_watched_issues, self.project) do |role, user|
-          case role.issues_visibility
-            when 'watch'
-              self.watchers.detect{ |w| w.user == user }.present?
-            else
-              false
-          end
+          self.watchers.detect{ |w| w.user == user }.present?
         end
     end
 
     def visible_with_authors?(usr = nil)
       visible_without_authors?(usr) ||
         (usr || User.current).allowed_to?(:view_own_issues, self.project) do |role, user|
-          case role.issues_visibility
-            when 'own'
-              self.author_id == user.id
-            else
-              false
-          end
+          self.author_id == user.id
         end
     end
   end

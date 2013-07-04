@@ -3,8 +3,7 @@
 Redmine plugin that adds new system role "Non member watcher" and "Non member author".
 
 This plugin allows to set permissions for watchers and issue authors that are not members of a
-project. For this purpose there are new builtin roles "Non member watcher"and "Non member author" and
-new issues visibility options "Issues watched by the user" and "Issues created by the user".
+project. For this purpose there are new builtin roles "Non member watcher"and "Non member author".
 Non member watchers and authors can receive email notifications if you switching on new
 permission "Receive email notifications" (Note: permission "View issues" must be enabled).
 
