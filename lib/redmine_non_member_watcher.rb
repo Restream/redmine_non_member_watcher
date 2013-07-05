@@ -15,3 +15,4 @@ end
 
 # if redmine default data loaded then try load default data for this plugin
 Role.non_member_watcher if Role.any? rescue nil
+Role.non_member_author if Role.any? rescue nil
