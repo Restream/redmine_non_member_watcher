@@ -20,13 +20,13 @@ module RedmineNonMemberWatcher::Patches
 
     def allowed_to_with_non_member_roles?(action, context, options={}, &block)
       allowed_to_without_non_member_roles?(action, context, options, &block) ||
-        if context && context.is_a?(Project)
+        if logged? && context && context.is_a?(Project)
           roles = roles_for_project(context)
-          roles.detect { |role|
+          roles.any? { |role|
             (role == Role.non_member_watcher || role == Role.non_member_author) &&
                 role.allowed_to?(action) &&
                 (block_given? ? yield(role, self) : true)
-          } || false
+          }
         else
           false
         end

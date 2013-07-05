@@ -3,6 +3,24 @@ require File.expand_path('../../../../test_helper', __FILE__)
 class RolePatchTest < ActiveSupport::TestCase
   fixtures :roles
 
+  def test_allowed_to
+    only_permissions = [
+        :view_watched_issues,
+        :view_watched_issues_list,
+        :receive_watched_issues_notifications
+    ]
+    role = Role.non_member_watcher
+    role.permissions = only_permissions
+    Role.non_member_watcher.save!
+    Redmine::AccessControl.permissions.each do |perm|
+      if only_permissions.include?(perm.name)
+        assert_true  role.allowed_to?(perm.name), "Permission #{perm.name} should be allowed"
+      else
+        assert_false role.allowed_to?(perm.name), "Permission #{perm.name} should not be allowed"
+      end
+    end
+  end
+
   context "#non_member_watcher" do
     should "return the non-member-watcher role" do
       role = Role.non_member_watcher

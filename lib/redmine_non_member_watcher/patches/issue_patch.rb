@@ -14,12 +14,17 @@ module RedmineNonMemberWatcher::Patches
 
     module ClassMethods
       def visible_condition_with_non_member_roles(user, options={})
-        issues_cond = visible_condition_without_non_member_roles(user, options)
-        watched_issues_cond = watched_issues_condition(user, options)
-        own_issues_cond = own_issues_condition(user, options)
-        conditions = [issues_cond, watched_issues_cond, own_issues_cond]
-        conditions.delete_if { |c| c == '1=0' }
-        conditions.compact!
+        conditions = []
+        conditions << visible_condition_without_non_member_roles(user, options)
+
+        if user.logged?
+          watched_issues_cond = watched_issues_condition(user, options)
+          conditions << watched_issues_cond unless watched_issues_cond == '1=0'
+
+          own_issues_cond = own_issues_condition(user, options)
+          conditions << own_issues_cond unless own_issues_cond == '1=0'
+        end
+
         conditions.map { |c| "(#{c})" }.join(' OR ')
       end
 
