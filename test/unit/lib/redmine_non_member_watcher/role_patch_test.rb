@@ -6,8 +6,7 @@ class RolePatchTest < ActiveSupport::TestCase
   def test_allowed_to
     only_permissions = [
         :view_watched_issues,
-        :view_watched_issues_list,
-        :receive_watched_issues_notifications
+        :view_watched_issues_list
     ]
     role = Role.non_member_watcher
     role.permissions = only_permissions

@@ -12,7 +12,7 @@ class RedmineNonMemberWatcher::WatchersControllerTest < ActionController::TestCa
            :versions,
            :issue_statuses, :issue_categories, :issue_relations, :workflows,
            :enumerations,
-           :issues
+           :issues, :attachments
 
   def setup
     prepare_for_testing_non_meber_roles
@@ -22,6 +22,9 @@ class RedmineNonMemberWatcher::WatchersControllerTest < ActionController::TestCa
   end
 
   def test_unwatch_for_non_member_watcher
+    role = Role.non_member_watcher
+    role.permissions = [:view_watched_issues]
+    role.save!
     User.current = @watcher
     @request.session[:user_id] = @watcher.id
     xhr :post, :unwatch, :object_type => 'issue', :object_id => @issue.id
