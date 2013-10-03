@@ -1,5 +1,8 @@
 # Non member watcher
 
+[![Build Status](https://travis-ci.org/Undev/redmine_non_member_watcher.png)](https://travis-ci.org/Undev/redmine_non_member_watcher)
+[![Code Climate](https://codeclimate.com/github/Undev/redmine_non_member_watcher.png)](https://codeclimate.com/github/Undev/redmine_non_member_watcher)
+
 Redmine plugin that adds new system role "Non member watcher" and "Non member author".
 
 This plugin allows to set permissions for watchers and issue authors that are not members of a
