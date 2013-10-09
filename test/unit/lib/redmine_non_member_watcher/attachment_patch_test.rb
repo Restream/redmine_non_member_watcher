@@ -25,7 +25,7 @@ class AttachmentPatchTest < ActiveSupport::TestCase
     Role.non_member_watcher.update_attributes({
         :permissions => []
     })
-    assert_false @attachment.visible?(@watcher)
+    assert_equal false, @attachment.visible?(@watcher)
   end
 
   def test_visible_for_non_member_authors
@@ -39,7 +39,7 @@ class AttachmentPatchTest < ActiveSupport::TestCase
     Role.non_member_author.update_attributes({
         :permissions => []
     })
-    assert_false @attachment.visible?(@author)
+    assert_equal false, @attachment.visible?(@author)
   end
 end
 

@@ -25,7 +25,7 @@ class IssuePatchTest < ActiveSupport::TestCase
     Role.non_member_watcher.update_attributes({
         :permissions => []
     })
-    assert_false @issue.visible?(@watcher)
+    assert_equal false, @issue.visible?(@watcher)
   end
 
   def test_issue_included_in_visible_watcher_scope
@@ -65,7 +65,7 @@ class IssuePatchTest < ActiveSupport::TestCase
     Role.non_member_author.update_attributes({
         :permissions => []
     })
-    assert_false @issue.visible?(@author)
+    assert_equal false, @issue.visible?(@author)
   end
 
   def test_issue_included_in_visible_scope

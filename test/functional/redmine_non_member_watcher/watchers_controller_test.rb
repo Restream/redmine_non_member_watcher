@@ -30,6 +30,6 @@ class RedmineNonMemberWatcher::WatchersControllerTest < ActionController::TestCa
     xhr :post, :unwatch, :object_type => 'issue', :object_id => @issue.id
     assert_response :success
     @issue.reload
-    assert_false @issue.watched_by?(@watcher)
+    assert_equal false, @issue.watched_by?(@watcher)
   end
 end

@@ -15,7 +15,7 @@ class RolePatchTest < ActiveSupport::TestCase
       if only_permissions.include?(perm.name)
         assert_true  role.allowed_to?(perm.name), "Permission #{perm.name} should be allowed"
       else
-        assert_false role.allowed_to?(perm.name), "Permission #{perm.name} should not be allowed"
+        assert_equal false, role.allowed_to?(perm.name), "Permission #{perm.name} should not be allowed"
       end
     end
   end

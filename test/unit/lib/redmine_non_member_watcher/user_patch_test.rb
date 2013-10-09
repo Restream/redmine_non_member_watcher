@@ -30,7 +30,7 @@ class UserPatchTest < ActiveSupport::TestCase
     role = Role.non_member_watcher
     role.permissions = []
     role.save!
-    assert_false !!@watcher.allowed_to?(:view_watched_issues, @project)
+    assert_equal false, !!@watcher.allowed_to?(:view_watched_issues, @project)
   end
 
   def test_author_has_non_member_author_role
@@ -49,7 +49,7 @@ class UserPatchTest < ActiveSupport::TestCase
     role = Role.non_member_author
     role.permissions = []
     role.save!
-    assert_false !!@author.allowed_to?(:view_own_issues, @project)
+    assert_equal false, !!@author.allowed_to?(:view_own_issues, @project)
   end
 end
 
