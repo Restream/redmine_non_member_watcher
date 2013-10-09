@@ -13,7 +13,7 @@ class RolePatchTest < ActiveSupport::TestCase
     Role.non_member_watcher.save!
     Redmine::AccessControl.permissions.each do |perm|
       if only_permissions.include?(perm.name)
-        assert_true  role.allowed_to?(perm.name), "Permission #{perm.name} should be allowed"
+        assert_equal true,  role.allowed_to?(perm.name), "Permission #{perm.name} should be allowed"
       else
         assert_equal false, role.allowed_to?(perm.name), "Permission #{perm.name} should not be allowed"
       end
