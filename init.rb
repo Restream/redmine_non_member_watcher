@@ -5,9 +5,9 @@ Rails.application.paths["app/overrides"] ||= []
 Rails.application.paths["app/overrides"] << File.expand_path("../app/overrides", __FILE__)
 
 Redmine::Plugin.register :redmine_non_member_watcher do
-  name 'Redmine Non Member Watcher plugin'
-  author 'Danil Tashkinov'
-  description 'Redmine plugin that adds new system roles "Non member watcher" and "Non member author"'
+  name 'Redmine Non Member Watcher Plugin'
+  author 'Undev'
+  description 'This plugins adds "Non member watcher" and "Non member author" system roles to Redmine.'
   version '0.2.3'
   url 'https://github.com/Undev/redmine_non_member_watcher'
   author_url 'https://github.com/Undev'

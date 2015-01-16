@@ -1,4 +1,4 @@
-# Non member watcher
+# Redmine Non Member Watcher Plugin
 
 [![Build Status](https://travis-ci.org/Undev/redmine_non_member_watcher.png)](https://travis-ci.org/Undev/redmine_non_member_watcher)
 [![Code Climate](https://codeclimate.com/github/Undev/redmine_non_member_watcher.png)](https://codeclimate.com/github/Undev/redmine_non_member_watcher)
