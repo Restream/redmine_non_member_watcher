@@ -7,7 +7,7 @@ This plugin adds two new system roles to Redmine, **Non member watcher** and **N
 
 ## Compatibility
 
-This plugin is compatible with Redmine 2.x only.
+This plugin is compatible only with Redmine 2.1.x and later.
 
 ## Installation
 
