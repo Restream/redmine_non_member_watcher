@@ -58,7 +58,7 @@ You can set the following issue tracking permissions for the **Non member author
 
 ## License
 
-Copyright (c) 2014 Undev
+Copyright (c) 2015 Undev
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
