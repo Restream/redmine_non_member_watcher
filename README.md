@@ -60,6 +60,10 @@ You can set the following issue tracking permissions for the **Non member author
 * View own issues list
 ![non member watcher](non_member_3.PNG)
 
+## Maintainers
+
+Danil Tashkinov, [github.com/nodecarter](https://github.com/nodecarter)
+
 ## License
 
 Copyright (c) 2015 Undev
