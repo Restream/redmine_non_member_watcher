@@ -15,7 +15,7 @@ module RedmineNonMemberWatcher::Patches
     module ClassMethods
       def visible_condition_with_non_member_roles(user, options={})
         conditions = []
-        conditions << visible_condition_without_non_member_roles(user, options)
+        conditions << visible_condition_with_watched_issues(user, options)
 
         if user.logged?
           watched_issues_cond = watched_issues_condition(user, options)
@@ -40,6 +40,41 @@ module RedmineNonMemberWatcher::Patches
       def own_issues_condition(user, options={})
         Project.allowed_to_condition(user, :view_own_issues_list, options) do |role, user|
           "#{Issue.table_name}.author_id = #{user.id}"
+        end
+      end
+
+      # See issues with watched items
+      def visible_condition_with_watched_issues(user, options={})
+        Project.allowed_to_condition(user, :view_issues, options) do |role, user|
+          if user.logged?
+
+            # Add watched issues to list if allowed
+            watched_condition = if role.allowed_to?( :view_watched_issues_list )
+              <<-SQL
+                OR EXISTS ( SELECT * FROM #{ Watcher.table_name } as wts
+                            WHERE wts.watchable_type = 'Issue'
+                            AND wts.watchable_id = #{Issue.table_name}.id
+                            AND wts.user_id = #{ user.id } )
+              SQL
+            else
+              ''
+            end
+
+            case role.issues_visibility
+              when 'all'
+                nil
+              when 'default'
+                user_ids = [user.id] + user.groups.map(&:id)
+                "(#{table_name}.is_private = #{connection.quoted_false} OR #{table_name}.author_id = #{user.id} OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}) #{ watched_condition })"
+              when 'own'
+                user_ids = [user.id] + user.groups.map(&:id)
+                "(#{table_name}.author_id = #{user.id} OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}) #{ watched_condition })"
+              else
+                '1=0'
+            end
+          else
+            "(#{table_name}.is_private = #{connection.quoted_false})"
+          end
         end
       end
     end

@@ -15,8 +15,8 @@ Redmine::Plugin.register :redmine_non_member_watcher do
 
   project_module :issue_tracking do |map|
     # non_member_watcher
-    map.permission :view_watched_issues, { :issues => [:show] }, :require => :non_member_watcher
-    map.permission :view_watched_issues_list, { :issues => [:index] }, :require => :non_member_watcher
+    map.permission :view_watched_issues, { :issues => [:show] }
+    map.permission :view_watched_issues_list, { :issues => [:index] }
 
     # non_member_author
     map.permission :view_own_issues, { :issues => [:show] }, :require => :non_member_author
