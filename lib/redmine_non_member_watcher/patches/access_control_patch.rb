@@ -1,4 +1,4 @@
-require 'redmine/access_control'
+require_dependency 'redmine/access_control'
 
 module RedmineNonMemberWatcher::Patches
   module AccessControlPatch
@@ -7,15 +7,13 @@ module RedmineNonMemberWatcher::Patches
     module ClassMethods
       def non_member_watcher_permissions
         permissions.select do |p|
-          [:edit_issues, :add_issue_notes].include?(p.name) ||
-              p.require_non_member_watcher?
+          [:edit_issues, :add_issue_notes].include?(p.name) || p.require_non_member_watcher?
         end
       end
 
       def non_member_author_permissions
         permissions.select do |p|
-          [:edit_issues, :add_issue_notes].include?(p.name) ||
-              p.require_non_member_author?
+          [:edit_issues, :add_issue_notes].include?(p.name) || p.require_non_member_author?
         end
       end
     end
@@ -34,12 +32,4 @@ module RedmineNonMemberWatcher::Patches
       @require && @require == :non_member_author
     end
   end
-end
-
-unless Redmine::AccessControl.included_modules.include? RedmineNonMemberWatcher::Patches::AccessControlPatch
-  Redmine::AccessControl.send :include, RedmineNonMemberWatcher::Patches::AccessControlPatch
-end
-
-unless Redmine::AccessControl::Permission.included_modules.include? RedmineNonMemberWatcher::Patches::AccessControlPermissionPatch
-  Redmine::AccessControl::Permission.send :include, RedmineNonMemberWatcher::Patches::AccessControlPermissionPatch
 end

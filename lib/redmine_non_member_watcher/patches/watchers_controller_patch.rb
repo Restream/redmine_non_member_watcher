@@ -1,4 +1,4 @@
-require 'watchers_controller'
+require_dependency 'watchers_controller'
 
 module RedmineNonMemberWatcher::Patches
   module WatchersControllerPatch
@@ -13,12 +13,8 @@ module RedmineNonMemberWatcher::Patches
 
     def allowed_to_unwatch?
       action_name == 'unwatch' &&
-          User.current.allowed_to?(:view_watched_issues, @project) &&
-          @watched.watched_by?(User.current)
+        User.current.allowed_to?(:view_watched_issues, @project) &&
+        @watched.watched_by?(User.current)
     end
   end
-end
-
-unless WatchersController.included_modules.include? RedmineNonMemberWatcher::Patches::WatchersControllerPatch
-  WatchersController.send :include, RedmineNonMemberWatcher::Patches::WatchersControllerPatch
 end

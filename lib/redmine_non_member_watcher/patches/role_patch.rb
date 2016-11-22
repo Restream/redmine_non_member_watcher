@@ -1,4 +1,4 @@
-require 'role'
+require_dependency 'role'
 
 module RedmineNonMemberWatcher::Patches
   module RolePatch
@@ -55,8 +55,4 @@ module RedmineNonMemberWatcher::Patches
       end
     end
   end
-end
-
-unless Role.included_modules.include? RedmineNonMemberWatcher::Patches::RolePatch
-  Role.send :include, RedmineNonMemberWatcher::Patches::RolePatch
 end

@@ -1,4 +1,4 @@
-require 'issue'
+require_dependency 'issue'
 
 module RedmineNonMemberWatcher::Patches
   module IssuePatch
@@ -49,7 +49,7 @@ module RedmineNonMemberWatcher::Patches
           if user.logged?
 
             # Add watched issues to list if allowed
-            watched_condition = if role.allowed_to?( :view_watched_issues_list )
+            watched_condition = if role.allowed_to?(:view_watched_issues_list)
               <<-SQL
                 OR EXISTS ( SELECT * FROM #{ Watcher.table_name } as wts
                             WHERE wts.watchable_type = 'Issue'
@@ -82,7 +82,7 @@ module RedmineNonMemberWatcher::Patches
     def visible_with_watchers?(usr = nil)
       visible_without_watchers?(usr) ||
         (usr || User.current).allowed_to?(:view_watched_issues, self.project) do |role, user|
-          self.watchers.detect{ |w| w.user == user }.present?
+          self.watchers.detect { |w| w.user == user }.present?
         end
     end
 
@@ -93,8 +93,4 @@ module RedmineNonMemberWatcher::Patches
         end
     end
   end
-end
-
-unless Issue.included_modules.include? RedmineNonMemberWatcher::Patches::IssuePatch
-  Issue.send :include, RedmineNonMemberWatcher::Patches::IssuePatch
 end

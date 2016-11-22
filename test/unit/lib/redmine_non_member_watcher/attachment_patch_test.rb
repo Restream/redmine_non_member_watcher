@@ -2,13 +2,13 @@ require File.expand_path('../../../../test_helper', __FILE__)
 
 class AttachmentPatchTest < ActiveSupport::TestCase
   fixtures :projects, :users, :members, :member_roles, :roles,
-           :groups_users,
-           :trackers, :projects_trackers,
-           :enabled_modules,
-           :versions,
-           :issue_statuses, :issue_categories, :issue_relations, :workflows,
-           :enumerations,
-           :issues, :attachments
+    :groups_users,
+    :trackers, :projects_trackers,
+    :enabled_modules,
+    :versions,
+    :issue_statuses, :issue_categories, :issue_relations, :workflows,
+    :enumerations,
+    :issues, :attachments
 
   def setup
     prepare_for_testing_non_meber_roles
@@ -16,28 +16,28 @@ class AttachmentPatchTest < ActiveSupport::TestCase
 
   def test_visible_for_non_member_watchers
     Role.non_member_watcher.update_attributes({
-        :permissions => [:view_watched_issues]
+      permissions: [:view_watched_issues]
     })
     assert @attachment.visible?(@watcher)
   end
 
   def test_not_visible_for_non_member_watchers
     Role.non_member_watcher.update_attributes({
-        :permissions => []
+      permissions: []
     })
     assert_equal false, @attachment.visible?(@watcher)
   end
 
   def test_visible_for_non_member_authors
     Role.non_member_author.update_attributes({
-        :permissions => [:view_own_issues]
+      permissions: [:view_own_issues]
     })
     assert @attachment.visible?(@author)
   end
 
   def test_not_visible_for_non_member_authors
     Role.non_member_author.update_attributes({
-        :permissions => []
+      permissions: []
     })
     assert_equal false, @attachment.visible?(@author)
   end

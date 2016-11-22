@@ -1,13 +1,13 @@
 # Redmine Non Member Watcher Plugin
 
-[![Build Status](https://travis-ci.org/Undev/redmine_non_member_watcher.png)](https://travis-ci.org/Undev/redmine_non_member_watcher)
-[![Code Climate](https://codeclimate.com/github/Undev/redmine_non_member_watcher.png)](https://codeclimate.com/github/Undev/redmine_non_member_watcher)
+[![Build Status](https://travis-ci.org/Restream/redmine_non_member_watcher.svg?branch=master)](https://travis-ci.org/Restream/redmine_non_member_watcher)
+[![Code Climate](https://codeclimate.com/github/Restream/redmine_non_member_watcher/badges/gpa.svg)](https://codeclimate.com/github/Restream/redmine_non_member_watcher)
 
 This plugin adds two new system roles to Redmine, **Non member watcher** and **Non member author**. With these roles, you can set permissions for watchers and issue authors who are not the project members. 
 
 ## Compatibility
 
-This plugin is compatible only with Redmine 2.1.x and later.
+This plugin is compatible only with Redmine 3.x and later.
 
 ## Installation
 
@@ -22,18 +22,11 @@ This plugin is compatible only with Redmine 2.1.x and later.
  
       Copy the plugin from GitHub using the following command:
 
-            git clone https://github.com/Undev/redmine_non_member_watcher.git plugins/redmine_non_member_watcher
+            git clone https://github.com/Restream/redmine_non_member_watcher.git plugins/redmine_non_member_watcher
 
 2. Install the required gems using the command:  
 
         bundle install  
-
-    * In case of bundle install errors, remove the Gemfile.lock file, update the local package index and install the required dependencies. Then execute the `bundle install` command again:  
-
-            rm Gemfile.lock
-            sudo apt-get update
-            sudo apt-get install -y libxml2-dev libxslt-dev libpq-dev
-            bundle install
 
 3. Restart Redmine.
 
@@ -42,7 +35,7 @@ Now you should be able to see the plugin in **Administration > Plugins**.
 ## Usage
 
 The plugin adds two new roles to **Administration > Roles and Permissions**:
-![new system roles](non_member_1.PNG)
+![new system roles](doc/non_member_1.png)
 
 You can set the following issue tracking permissions for the **Non member watcher** role:
 
@@ -50,7 +43,7 @@ You can set the following issue tracking permissions for the **Non member watche
 * Add notes
 * View watched issues
 * View watched issues list
-![non member watcher](non_member_2.PNG)
+![non member watcher](doc/non_member_2.png)
 
 You can set the following issue tracking permissions for the **Non member author** role:
 
@@ -58,7 +51,7 @@ You can set the following issue tracking permissions for the **Non member author
 * Add notes
 * View own issues
 * View own issues list
-![non member watcher](non_member_3.PNG)
+![non member watcher](doc/non_member_3.png)
 
 ## Maintainers
 
@@ -66,7 +59,7 @@ Danil Tashkinov, [github.com/nodecarter](https://github.com/nodecarter)
 
 ## License
 
-Copyright (c) 2015 Undev
+Copyright (c) 2016 Restream
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

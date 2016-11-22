@@ -1,4 +1,4 @@
-require 'user'
+require_dependency 'user'
 
 module RedmineNonMemberWatcher::Patches
   module UserPatch
@@ -24,16 +24,12 @@ module RedmineNonMemberWatcher::Patches
           roles = roles_for_project(context)
           roles.any? { |role|
             (role == Role.non_member_watcher || role == Role.non_member_author) &&
-                role.allowed_to?(action) &&
-                (block_given? ? yield(role, self) : true)
+              role.allowed_to?(action) &&
+              (block_given? ? yield(role, self) : true)
           }
         else
           false
         end
     end
   end
-end
-
-unless User.included_modules.include? RedmineNonMemberWatcher::Patches::UserPatch
-  User.send :include, RedmineNonMemberWatcher::Patches::UserPatch
 end
